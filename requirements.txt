@@ -1,3 +1,4 @@
 # requirements.txt
 Flask
 gunicorn
+psycopg2-binary
