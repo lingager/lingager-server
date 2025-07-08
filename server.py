@@ -15,7 +15,8 @@ app = Flask(__name__)
 # This uses the secret key you set as an environment variable on Render.
 ADMIN_API_KEY = os.environ.get('LINGAGER_ADMIN_KEY', 'default_secret_key_for_testing')
 
-# --- Public Endpoint (for your application) ---
+# --- Public Endpoints ---
+
 @app.route('/check_license', methods=['POST'])
 def check_license():
     """
@@ -33,6 +34,14 @@ def check_license():
     else:
         # This is correct, it tells your app the license isn't on the server yet.
         return jsonify({'status': 'not_found'}), 404
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    """
+    A simple endpoint for an uptime monitor to hit to keep the server awake.
+    """
+    return jsonify({'status': 'ok'}), 200
+
 
 # =====================================================================
 # --- Admin Endpoints (for you to manage customers) ---
