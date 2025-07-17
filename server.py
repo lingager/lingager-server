@@ -77,10 +77,12 @@ def admin_add_license():
     data = request.get_json()
     license_id = data.get('license_id')
     email = data.get('customer_email')
-    if not license_id or not email:
-        return jsonify({'error': 'Missing license_id or customer_email'}), 400
+    fingerprint = data.get('fingerprint') # Get the new fingerprint field
+    
+    if not all([license_id, email, fingerprint]):
+        return jsonify({'error': 'Missing license_id, customer_email, or fingerprint'}), 400
 
-    success, message = add_new_license(license_id, email)
+    success, message = add_new_license(license_id, email, fingerprint)
     if success:
         return jsonify({'message': message}), 201
     else:

@@ -19,6 +19,7 @@ def init_db():
                     id SERIAL PRIMARY KEY,
                     license_id TEXT NOT NULL UNIQUE,
                     customer_email TEXT,
+                    fingerprint TEXT,
                     status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'expired', 'cancelled')),
                     creation_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
                 )
@@ -34,14 +35,14 @@ def get_license_status(license_id):
             result = cur.fetchone()
             return result['status'] if result else None
 
-def add_new_license(license_id, email):
-    """Adds a new license to the database."""
+def add_new_license(license_id, email, fingerprint):
+    """Adds a new license to the database, including the fingerprint."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             try:
                 cur.execute(
-                    "INSERT INTO licenses (license_id, customer_email) VALUES (%s, %s)",
-                    (license_id, email)
+                    "INSERT INTO licenses (license_id, customer_email, fingerprint) VALUES (%s, %s, %s)",
+                    (license_id, email, fingerprint)
                 )
                 conn.commit()
                 return True, "License added successfully."
@@ -67,10 +68,10 @@ def update_license_status(license_id, new_status):
             return True, f"License status updated to {new_status}."
 
 def get_all_licenses():
-    """Retrieves all licenses for admin viewing."""
+    """Retrieves all licenses for admin viewing, including the fingerprint."""
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=DictCursor) as cur:
-            cur.execute("SELECT id, license_id, customer_email, status, creation_date FROM licenses")
+            cur.execute("SELECT id, license_id, customer_email, fingerprint, status, creation_date FROM licenses")
             licenses = cur.fetchall()
             # Convert list of DictRow objects to list of dictionaries
             return [dict(row) for row in licenses]
